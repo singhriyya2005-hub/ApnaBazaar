@@ -1,35 +1,147 @@
-function Register() {
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+function Register({ loginUser }) {
+  const [role, setRole] = useState("customer");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.target);
+
+    const userData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      password: formData.get("password"),
+      role,
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        alert(data.message || "Registration failed");
+        setLoading(false);
+        return;
+      }
+
+      loginUser(data.user);
+
+      alert("Account created successfully!");
+      navigate("/profile");
+    } catch (error) {
+      console.log("Register error:", error);
+      alert("Something went wrong during registration.");
+    }
+
+    setLoading(false);
+  };
+
   return (
-    <div className="hero">
-      <h1>Create Account</h1>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg">
+        <Link
+          to="/profile"
+          className="inline-block mb-6 text-green-600 hover:underline"
+        >
+          ← Back to Profile
+        </Link>
 
-      <br />
+        <h1 className="text-3xl font-bold mb-2">
+          Create Your Account
+        </h1>
 
-      <input
-        type="text"
-        placeholder="Full Name"
-      />
+        <p className="text-gray-500 mb-6">
+          Join ApnaBazaar as a customer or seller.
+        </p>
 
-      <br />
-      <br />
+        <form onSubmit={handleRegister} className="space-y-4">
+          <input
+            name="name"
+            type="text"
+            placeholder="Full Name"
+            className="w-full border p-3 rounded-lg"
+            required
+          />
 
-      <input
-        type="email"
-        placeholder="Email"
-      />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email Address"
+            className="w-full border p-3 rounded-lg"
+            required
+          />
 
-      <br />
-      <br />
+          <input
+            name="phone"
+            type="tel"
+            placeholder="Phone Number"
+            className="w-full border p-3 rounded-lg"
+            required
+          />
 
-      <input
-        type="password"
-        placeholder="Password"
-      />
+          <input
+            name="password"
+            type="password"
+            placeholder="Create Password"
+            className="w-full border p-3 rounded-lg"
+            required
+          />
 
-      <br />
-      <br />
+          <div>
+            <p className="font-semibold mb-2">Register as</p>
 
-      <button>Register</button>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setRole("customer")}
+                className={`p-3 rounded-lg border ${
+                  role === "customer" ? "bg-green-600 text-white" : "bg-white"
+                }`}
+              >
+                🛒 Customer
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRole("seller")}
+                className={`p-3 rounded-lg border ${
+                  role === "seller" ? "bg-green-600 text-white" : "bg-white"
+                }`}
+              >
+                🏪 Seller
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
+          >
+            {loading ? "Creating Account..." : "Create Account"}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-500 mt-6">
+          Already have an account?{" "}
+          <Link to="/login" className="text-green-600 font-semibold">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

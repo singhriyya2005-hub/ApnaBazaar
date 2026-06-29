@@ -1,23 +1,35 @@
 import { Link } from "react-router-dom";
 
-function Navbar() {
+function Navbar({ cartCount, isSeller }) {
   return (
-    <nav className="navbar">
-      <h2>🛍️ ApnaBazaar</h2>
+    <nav className="bg-white shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <Link to="/" className="text-2xl font-bold text-green-600">
+          🛍️ ApnaBazaar
+        </Link>
 
-      <ul className="nav-links">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
+        <div className="flex items-center gap-5">
+          <Link to="/" className="text-gray-700 hover:text-green-600">
+            Home
+          </Link>
 
-        <li>
-          <Link to="/login">Login</Link>
-        </li>
+          {!isSeller && (
+            <>
+              <Link to="/reels" className="text-gray-700 hover:text-green-600">
+                🎥 Reels
+              </Link>
 
-        <li>
-          <Link to="/register">Register</Link>
-        </li>
-      </ul>
+              <Link to="/cart" className="text-gray-700 hover:text-green-600">
+                🛒 Cart ({cartCount})
+              </Link>
+            </>
+          )}
+
+          <Link to="/profile" className="text-gray-700 hover:text-green-600">
+            👤 Profile
+          </Link>
+        </div>
+      </div>
     </nav>
   );
 }
